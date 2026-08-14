@@ -1,0 +1,47 @@
+# SA1 ------ + ----- SA2 ------- + ------ SA3W ------- + ----- SA4
+#                                                      + ----- WV2
+#        Hp0 <-5cm--
+version: 1
+tracks:
+  - id: SA1
+    length: 10cm
+    #type: regular
+    occupancy_id: 1
+  - id: SA2
+    length: 80cm
+    occupancy_id: 2
+  - id: SA3W
+    length: 10cm
+    type: turnout
+    occupancy_id: 3
+    throw_id: 4
+    reverse_polarity_id: 5
+  - id: SA4
+    length: 15cm
+    occupancy_id: 6
+  - id: WV2
+    length: 4cm
+    occupancy_id: 7
+connections:
+  # Having only one connection indicates one terminating end.
+  SA1: [SA2]
+  # Modeling the connection both ways SA1 <-> SA2 means the train can move both ways.
+  SA2:
+    - SA1
+    - SA3W
+  # Having more than two connections indicates a switch.
+  SA3W:
+    - SA2
+    - SA4
+    - WV2
+  SA4: [SA3W]
+  WV2: [SA3W]
+signals:
+  - id: S1
+    from: SA2
+    to: SA1
+    type: main
+    # Distance "from" SA2 until the signal.
+    distance: 5cm
+    aspects:
+      - name: Hp 0
