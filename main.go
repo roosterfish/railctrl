@@ -1,6 +1,6 @@
 package main
 
-import "githu.com/roosterfish/railctrl/cmd"
+import "github.com/roosterfish/railctrl/cmd"
 
 func main() {
 	// Run the CLI.

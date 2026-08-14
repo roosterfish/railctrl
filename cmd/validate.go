@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"githu.com/roosterfish/railctrl/internal/config"
+	"github.com/roosterfish/railctrl/internal/config"
 	"github.com/spf13/cobra"
 )
 

@@ -1,4 +1,4 @@
-module githu.com/roosterfish/railctrl
+module github.com/roosterfish/railctrl
 
 go 1.26.5
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"githu.com/roosterfish/railctrl/api"
+	"github.com/roosterfish/railctrl/api"
 	"go.yaml.in/yaml/v4"
 )
 
