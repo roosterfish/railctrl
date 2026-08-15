@@ -4,23 +4,24 @@
 version: 1
 tracks:
   - id: SA1
-    length: 10cm
+    # in mm
+    length: 100
     #type: regular
     occupancy_id: 1
   - id: SA2
-    length: 80cm
+    length: 800
     occupancy_id: 2
   - id: SA3W
-    length: 10cm
+    length: 100
     type: turnout
     occupancy_id: 3
     throw_id: 4
     reverse_polarity_id: 5
   - id: SA4
-    length: 15cm
+    length: 150
     occupancy_id: 6
   - id: WV2
-    length: 4cm
+    length: 40
     occupancy_id: 7
 connections:
   # Having only one connection indicates one terminating end.
@@ -42,6 +43,7 @@ signals:
     to: SA1
     type: main
     # Distance "from" SA2 until the signal.
-    distance: 5cm
+    # In mm.
+    distance: 50
     aspects:
       - name: Hp 0
