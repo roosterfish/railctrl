@@ -1,5 +1,7 @@
 package api
 
+import "fmt"
+
 type TrackType string
 
 type Turnout struct {
@@ -10,7 +12,7 @@ type Turnout struct {
 type Track struct {
 	ID          string    `yaml:"id"`
 	Type        TrackType `yaml:"type"`
-	Length      string    `yaml:"length"`
+	Length      int       `yaml:"length"`
 	OccupancyID int       `yaml:"occupancy_id"`
 
 	// Use pointer to make it an optional track property.
@@ -39,4 +41,96 @@ type Layout struct {
 	Tracks      []Track     `yaml:"tracks"`
 	Connections Connections `yaml:"connections"`
 	Signals     []Signal    `yaml:"signals"`
+}
+
+// Dijkstra finds the least expensive route between start and end tracks.
+func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
+	// Max int.
+	const infinity = int(^uint(0) >> 1)
+
+	// Look up tracks by their ID.
+	tracks := make(map[string]Track, len(l.Tracks))
+	for _, track := range l.Tracks {
+		tracks[track.ID] = track
+	}
+
+	_, ok := tracks[start]
+	if !ok {
+		return nil, 0, fmt.Errorf("invalid track %q", start)
+	}
+
+	_, ok = tracks[end]
+	if !ok {
+		return nil, 0, fmt.Errorf("invalid track %q", end)
+	}
+
+	dist := make(map[string]int)
+	prev := make(map[string]string)
+	visited := make(map[string]bool)
+
+	for _, track := range l.Tracks {
+		dist[track.ID] = infinity
+	}
+
+	dist[start] = 0
+
+	for {
+		// Find the unvisited track with the smallest distance.
+		current := ""
+		for id, d := range dist {
+			if !visited[id] && (current == "" || d < dist[current]) {
+				current = id
+			}
+		}
+
+		// No reachable tracks left.
+		if current == "" || dist[current] == infinity {
+			break
+		}
+
+		visited[current] = true
+
+		if current == end {
+			break
+		}
+
+		// Visit connected tracks.
+		for _, next := range l.Connections[current] {
+			nextTrack := tracks[string(next)]
+
+			weight, err := nextTrack.Weight()
+			if err != nil {
+				return nil, 0, fmt.Errorf("failed getting weight of track %q: %w", nextTrack.ID, err)
+			}
+
+			newDist := dist[current] + weight
+
+			if newDist < dist[string(next)] {
+				dist[string(next)] = newDist
+				prev[string(next)] = current
+			}
+		}
+	}
+
+	if dist[end] == infinity {
+		return nil, 0, fmt.Errorf("unable to find a route from %q to %q", start, end)
+	}
+
+	// Reconstruct path.
+	path := []string{}
+	for at := end; at != ""; at = prev[at] {
+		path = append(path, at)
+	}
+
+	// Reverse path.
+	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
+		path[i], path[j] = path[j], path[i]
+	}
+
+	return path, dist[end], nil
+}
+
+// Weight returns a track's weight when passing it.
+func (t *Track) Weight() (int, error) {
+	return t.Length, nil
 }
