@@ -4,7 +4,7 @@
 version: 1
 tracks:
   - id: SA1
-    # in mm
+    # In mm.
     length: 100
     #type: regular
     occupancy_id: 1
