@@ -38,8 +38,11 @@ connections:
   SA3W:
     - to: SA2
     - to: SA4
+      # Indicate this connection is from a turnout branch.
+      branch: true
       opposite_direction: true
     - to: WV2
+      branch: true
   SA4:
     - to: SA3W
   WV2:
