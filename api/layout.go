@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type TrackType string
 
@@ -21,6 +24,7 @@ type Track struct {
 
 type Connection struct {
 	To                string `yaml:"to"`
+	Branch            bool   `yaml:"branch"`
 	OppositeDirection bool   `yaml:"opposite_direction"`
 }
 
@@ -56,6 +60,12 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 	tracks := make(map[string]Track, len(l.Tracks))
 	for _, track := range l.Tracks {
 		tracks[track.ID] = track
+	}
+
+	// Look up connections by their ID.
+	connections := make(map[string][]Connection, len(l.Connections))
+	for from, fromConnections := range l.Connections {
+		connections[from] = fromConnections
 	}
 
 	_, ok := tracks[start]
@@ -101,6 +111,17 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 		// Visit connected tracks.
 		for _, next := range l.Connections[current] {
 			nextTrack := tracks[next.To]
+
+			// In case of a turnout (>2 connections), we cannot traverse it coming from one branch and exiting the other.
+			if len(l.Connections[current]) > 2 {
+				ok := slices.ContainsFunc(l.Connections[current], func(c Connection) bool {
+					_, ok := visited[c.To]
+					return ok && c.Branch && next.Branch
+				})
+				if ok {
+					continue
+				}
+			}
 
 			weight, err := nextTrack.Weight()
 			if err != nil {
