@@ -19,7 +19,11 @@ type Track struct {
 	*Turnout `yaml:",omitempty,inline"`
 }
 
-type Connection string
+type Connection struct {
+	To            string `yaml:"to"`
+	OppositeTrack bool   `yaml:"opposite_track"`
+}
+
 type Connections map[string][]Connection
 
 type SignalType string
@@ -96,18 +100,23 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 
 		// Visit connected tracks.
 		for _, next := range l.Connections[current] {
-			nextTrack := tracks[string(next)]
+			nextTrack := tracks[next.To]
 
 			weight, err := nextTrack.Weight()
 			if err != nil {
 				return nil, 0, fmt.Errorf("failed getting weight of track %q: %w", nextTrack.ID, err)
 			}
 
+			// Multiply the cost when the transition/direction between tracks indicates use of the opposite track.
+			if next.OppositeTrack {
+				weight *= 2
+			}
+
 			newDist := dist[current] + weight
 
-			if newDist < dist[string(next)] {
-				dist[string(next)] = newDist
-				prev[string(next)] = current
+			if newDist < dist[next.To] {
+				dist[next.To] = newDist
+				prev[next.To] = current
 			}
 		}
 	}
