@@ -20,8 +20,8 @@ type Track struct {
 }
 
 type Connection struct {
-	To            string `yaml:"to"`
-	OppositeTrack bool   `yaml:"opposite_track"`
+	To                string `yaml:"to"`
+	OppositeDirection bool   `yaml:"opposite_direction"`
 }
 
 type Connections map[string][]Connection
@@ -108,7 +108,7 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 			}
 
 			// Multiply the cost when the transition/direction between tracks indicates use of the opposite track.
-			if next.OppositeTrack {
+			if next.OppositeDirection {
 				weight *= 2
 			}
 
