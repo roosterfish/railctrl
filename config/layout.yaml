@@ -25,18 +25,25 @@ tracks:
     occupancy_id: 7
 connections:
   # Having only one connection indicates one terminating end.
-  SA1: [SA2]
+  SA1:
+    - to: SA2
+      # This connection is on the opposite track compared to the regular one which increases its cost.
+      opposite_track: true
   # Modeling the connection both ways SA1 <-> SA2 means the train can move both ways.
   SA2:
-    - SA1
-    - SA3W
-  # Having more than two connections indicates a switch.
+    - to: SA1
+    - to: SA3W
+      opposite_track: true
+  # Having more than two connections indicates a turnout.
   SA3W:
-    - SA2
-    - SA4
-    - WV2
-  SA4: [SA3W]
-  WV2: [SA3W]
+    - to: SA2
+    - to: SA4
+      opposite_track: true
+    - to: WV2
+  SA4:
+    - to: SA3W
+  WV2:
+    - to: SA3W
 signals:
   - id: S1
     from: SA2
