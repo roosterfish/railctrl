@@ -13,4 +13,5 @@ func init() {
 	rootCmd.AddCommand(interlockingCmd)
 
 	interlockingCmd.PersistentFlags().String("config", "", "Layout configuration file")
+	interlockingCmd.PersistentFlags().String("address", "", "Address to listen on or to connect to")
 }

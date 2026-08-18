@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/roosterfish/railctrl/internal/config"
+	"github.com/roosterfish/railctrl/api"
 	"github.com/spf13/cobra"
 	"go.yaml.in/yaml/v4"
 )
@@ -13,27 +14,18 @@ var routeCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	Short: "Calculate a route from start to end track",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		configPath, err := cmd.Flags().GetString("config")
+		address, err := cmd.Flags().GetString("address")
 		if err != nil {
 			return err
 		}
 
-		layout, err := config.DecodeLayout(configPath)
+		client := api.NewClient(address)
+		route, err := client.GetRouteFind(context.Background(), args[0], args[1])
 		if err != nil {
-			return err
+			return fmt.Errorf("failed finding route: %w", err)
 		}
 
-		route, cost, err := layout.Dijkstra(args[0], args[1])
-		if err != nil {
-			return err
-		}
-
-		output := map[string]any{
-			"cost":  cost,
-			"route": route,
-		}
-
-		bytes, err := yaml.Marshal(output)
+		bytes, err := yaml.Marshal(route)
 		if err != nil {
 			return fmt.Errorf("failed marshalling route: %w", err)
 		}
