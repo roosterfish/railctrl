@@ -54,7 +54,7 @@ type Layout struct {
 }
 
 // Dijkstra finds the least expensive route between start and end tracks.
-func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
+func (l *Layout) Dijkstra(start, end string) (*Route, error) {
 	// Max int.
 	const infinity = int(^uint(0) >> 1)
 
@@ -72,12 +72,12 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 
 	_, ok := tracks[start]
 	if !ok {
-		return nil, 0, fmt.Errorf("invalid track %q", start)
+		return nil, BadRequest(fmt.Errorf("invalid track %q", start))
 	}
 
 	_, ok = tracks[end]
 	if !ok {
-		return nil, 0, fmt.Errorf("invalid track %q", end)
+		return nil, BadRequest(fmt.Errorf("invalid track %q", end))
 	}
 
 	dist := make(map[string]int)
@@ -127,7 +127,7 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 
 			weight, err := nextTrack.Weight()
 			if err != nil {
-				return nil, 0, fmt.Errorf("failed getting weight of track %q: %w", nextTrack.ID, err)
+				return nil, Internal(fmt.Errorf("failed getting weight of track %q: %w", nextTrack.ID, err))
 			}
 
 			// Multiply the cost when the transition/direction between tracks indicates use of the opposite track.
@@ -145,13 +145,13 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 	}
 
 	if dist[end] == infinity {
-		return nil, 0, fmt.Errorf("unable to find a route from %q to %q", start, end)
+		return nil, BadRequest(fmt.Errorf("unable to find a route from %q to %q", start, end))
 	}
 
 	// Reconstruct path.
-	path := []string{}
+	path := []Track{}
 	for at := end; at != ""; at = prev[at] {
-		path = append(path, at)
+		path = append(path, tracks[at])
 	}
 
 	// Reverse path.
@@ -159,7 +159,10 @@ func (l *Layout) Dijkstra(start, end string) ([]string, int, error) {
 		path[i], path[j] = path[j], path[i]
 	}
 
-	return path, dist[end], nil
+	return &Route{
+		Path: path,
+		Cost: dist[end],
+	}, nil
 }
 
 // Weight returns a track's weight when passing it.
