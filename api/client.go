@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type Client struct {
@@ -36,7 +37,19 @@ func newClient(address string) *http.Client {
 	}
 }
 
+func (c *Client) ensureDeadline(ctx context.Context) (context.Context, context.CancelFunc) {
+	_, ok := ctx.Deadline()
+	if !ok {
+		return context.WithTimeout(ctx, 10*time.Second)
+	}
+
+	return ctx, func() {}
+}
+
 func (c *Client) request(ctx context.Context, method string, url string, in io.Reader, out any) error {
+	ctx, cancel := c.ensureDeadline(ctx)
+	defer cancel()
+
 	req, err := http.NewRequestWithContext(
 		ctx,
 		method,
