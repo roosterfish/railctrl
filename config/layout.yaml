@@ -23,6 +23,12 @@ tracks:
   - id: WV2
     length: 40
     occupancy_id: 7
+  - id: WV3
+    length: 40
+    occupancy_id: 8
+  - id: SA5
+    length: 150
+    occupancy_id: 9
 connections:
   # Having only one connection indicates one terminating end.
   SA1:
@@ -45,8 +51,15 @@ connections:
       branch: true
   SA4:
     - to: SA3W
+    - to: SA5
+      opposite_direction: true
   WV2:
     - to: SA3W
+    - to: WV3
+  WV3:
+    - to: WV2
+  SA5:
+    - to: SA4
 signals:
   - id: S1
     from: SA2
@@ -55,5 +68,19 @@ signals:
     # Distance "from" SA2 until the signal.
     # In mm.
     distance: 50
+    aspects:
+      - name: Hp 0
+  - id: S2
+    from: SA4
+    to: SA5
+    type: main
+    distance: 100
+    aspects:
+      - name: Hp 0
+  - id: S3
+    from: WV2
+    to: WV3
+    type: main
+    distance: 20
     aspects:
       - name: Hp 0
