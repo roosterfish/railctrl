@@ -41,6 +41,10 @@ func DecodeLayout(path string) (*api.Layout, error) {
 		return nil, fmt.Errorf("failed decoding layout: %w", err)
 	}
 
+	if layout.Version != api.LayoutVersion {
+		return nil, fmt.Errorf("unknown layout version %q expected %q", layout.Version, api.LayoutVersion)
+	}
+
 	return layout, nil
 }
 
