@@ -10,47 +10,47 @@ const LayoutVersion = "1"
 type TrackType string
 
 type Turnout struct {
-	ThrowID           int `yaml:"throw_id"`
-	ReversePolarityID int `yaml:"reverse_polarity_id"`
+	ThrowID           int `yaml:"throw_id" json:"throw_id"`
+	ReversePolarityID int `yaml:"reverse_polarity_id" json:"reverse_polarity_id"`
 }
 
 type Track struct {
-	ID          string    `yaml:"id"`
-	Type        TrackType `yaml:"type"`
-	Length      int       `yaml:"length"`
-	OccupancyID int       `yaml:"occupancy_id"`
+	ID          string    `yaml:"id" json:"id"`
+	Type        TrackType `yaml:"type,omitempty" json:"type,omitempty"`
+	Length      int       `yaml:"length" json:"length"`
+	OccupancyID int       `yaml:"occupancy_id" json:"occupancy_id"`
 
 	// Use pointer to make it an optional track property.
 	*Turnout `yaml:",omitempty,inline"`
 }
 
 type Connection struct {
-	To                string `yaml:"to"`
-	Branch            bool   `yaml:"branch"`
-	OppositeDirection bool   `yaml:"opposite_direction"`
+	To                string `yaml:"to" json:"to"`
+	Branch            bool   `yaml:"branch" json:"branch"`
+	OppositeDirection bool   `yaml:"opposite_direction" json:"opposite_direction"`
 }
 
 type Connections map[string][]Connection
 
 type SignalType string
 type SignalAspect struct {
-	Name string `yaml:"name"`
+	Name string `yaml:"name" json:"name"`
 }
 
 type Signal struct {
-	ID       string         `yaml:"id"`
-	From     string         `yaml:"from"`
-	To       string         `yaml:"to"`
-	Type     SignalType     `yaml:"type"`
-	Distance string         `yaml:"distance"`
-	Aspects  []SignalAspect `yaml:"aspects"`
+	ID       string         `yaml:"id" json:"id"`
+	From     string         `yaml:"from" json:"from"`
+	To       string         `yaml:"to" json:"to"`
+	Type     SignalType     `yaml:"type" json:"type"`
+	Distance string         `yaml:"distance" json:"distance"`
+	Aspects  []SignalAspect `yaml:"aspects" json:"aspects"`
 }
 
 type Layout struct {
-	Version     string      `yaml:"version"`
-	Tracks      []Track     `yaml:"tracks"`
-	Connections Connections `yaml:"connections"`
-	Signals     []Signal    `yaml:"signals"`
+	Version     string      `yaml:"version" json:"version"`
+	Tracks      []Track     `yaml:"tracks" json:"tracks"`
+	Connections Connections `yaml:"connections" json:"connections"`
+	Signals     []Signal    `yaml:"signals" json:"signals"`
 }
 
 // Dijkstra finds the least expensive route between start and end tracks.
