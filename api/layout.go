@@ -5,6 +5,8 @@ import (
 	"slices"
 )
 
+const LayoutVersion = "1"
+
 type TrackType string
 
 type Turnout struct {
